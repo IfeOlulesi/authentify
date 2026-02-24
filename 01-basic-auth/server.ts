@@ -13,22 +13,38 @@ app.get("/", (_req, res) => {
 
 // GET /books — authenticated users only
 app.get("/books", basicAuth, (_req, res) => {
-  // TODO
+  res.json(getAllBooks());
 });
 
 // GET /books/:id — authenticated users only
 app.get("/books/:id", basicAuth, (req, res) => {
-  // TODO
+  const book = getBookById(Number(req.params.id));
+  if (!book) {
+    res.status(404).json({ error: "Not Found" });
+    return;
+  }
+  res.json(book);
 });
 
 // POST /books — admin only
 app.post("/books", basicAuth, requireRole("admin"), (req, res) => {
-  // TODO
+  const { title, author, genre } = req.body;
+  if (!title || !author || !genre) {
+    res.status(400).json({ error: "Bad Request", message: "title, author, and genre are required" });
+    return;
+  }
+  const book = addBook(title, author, genre, req.user!.username);
+  res.status(201).json(book);
 });
 
 // DELETE /books/:id — admin only
 app.delete("/books/:id", basicAuth, requireRole("admin"), (req, res) => {
-  // TODO
+  const deleted = deleteBook(Number(req.params.id));
+  if (!deleted) {
+    res.status(404).json({ error: "Not Found" });
+    return;
+  }
+  res.json({ message: "Book deleted" });
 });
 
 app.listen(PORT, () => {
