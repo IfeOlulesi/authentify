@@ -34,13 +34,13 @@ export const users: User[] = [
 ];
 
 export function findUserByUsername(username: string): User | undefined {
-  // TODO
+  return users.find(u => u.username === username)
 }
 
 export function findUserById(id: string): User | undefined {
-  // TODO
+  return users.find(u => u.id === id)
 }
 
 export async function verifyPassword(plainText: string, hash: string): Promise<boolean> {
-  // TODO
+  return bcrypt.compare(plainText, hash)
 }
