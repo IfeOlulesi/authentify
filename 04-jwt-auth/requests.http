@@ -1,0 +1,92 @@
+# Module 04 — JWT Authentication
+# Run the server first: npm run 04:jwt-auth
+#
+# Key difference from token auth: the server issues a *signed* token.
+# Verification is cryptographic — no DB lookup needed.
+# But: access tokens can't be revoked. That's why they expire in 15 minutes.
+
+### GET /books — no token -> expect 401
+GET http://localhost:3004/books
+
+###
+
+### Login -> expect 200 with { accessToken, refreshToken }
+POST http://localhost:3004/login
+Content-Type: application/json
+
+{
+  "username": "alice",
+  "password": "password123"
+}
+
+###
+
+### GET /books — with access token -> expect 200
+GET http://localhost:3004/books
+Authorization: Bearer PASTE_ACCESS_TOKEN_HERE
+
+###
+
+### GET /me — inspect the JWT payload
+GET http://localhost:3004/me
+Authorization: Bearer PASTE_ACCESS_TOKEN_HERE
+
+###
+
+### Refresh — get a new access token using the refresh token
+POST http://localhost:3004/refresh
+Content-Type: application/json
+
+{
+  "refreshToken": "PASTE_REFRESH_TOKEN_HERE"
+}
+
+###
+
+### Login as admin
+POST http://localhost:3004/login
+Content-Type: application/json
+
+{
+  "username": "admin",
+  "password": "admin-secret"
+}
+
+###
+
+### POST /books — as admin -> expect 201
+POST http://localhost:3004/books
+Authorization: Bearer PASTE_ADMIN_ACCESS_TOKEN_HERE
+Content-Type: application/json
+
+{
+  "title": "Security Engineering",
+  "author": "Ross Anderson",
+  "genre": "security"
+}
+
+###
+
+### Logout — invalidates the refresh token
+POST http://localhost:3004/logout
+Content-Type: application/json
+
+{
+  "refreshToken": "PASTE_REFRESH_TOKEN_HERE"
+}
+
+###
+
+### Try to refresh after logout -> expect 401 (refresh token gone)
+POST http://localhost:3004/refresh
+Content-Type: application/json
+
+{
+  "refreshToken": "PASTE_REFRESH_TOKEN_HERE"
+}
+
+###
+
+### Access token still works until it expires (this is the revocation problem)
+GET http://localhost:3004/books
+Authorization: Bearer PASTE_ACCESS_TOKEN_HERE

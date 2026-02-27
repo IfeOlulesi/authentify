@@ -1,0 +1,82 @@
+# Module 02 — Session Authentication
+# Run the server first: npm run 02:session-auth
+#
+# Key difference from Basic Auth: login once, use cookie for everything after.
+# The -c flag saves cookies, -b flag sends them.
+
+### GET /books — no session -> expect 401
+GET http://localhost:3002/books
+
+###
+
+### Login as alice -> expect 200 + Set-Cookie header
+POST http://localhost:3002/login
+Content-Type: application/json
+
+{
+  "username": "alice",
+  "password": "password123"
+}
+
+###
+
+### GET /books — with session cookie -> expect 200
+# After logging in above, copy the value of the connect.sid cookie
+# and paste it below
+GET http://localhost:3002/books
+Cookie: connect.sid=PASTE_SESSION_COOKIE_HERE
+
+###
+
+### GET /me — inspect current session user
+GET http://localhost:3002/me
+Cookie: connect.sid=PASTE_SESSION_COOKIE_HERE
+
+###
+
+### POST /books — as alice (user role) -> expect 403
+POST http://localhost:3002/books
+Cookie: connect.sid=PASTE_SESSION_COOKIE_HERE
+Content-Type: application/json
+
+{
+  "title": "Alice's Book",
+  "author": "Alice",
+  "genre": "test"
+}
+
+###
+
+### Login as admin
+POST http://localhost:3002/login
+Content-Type: application/json
+
+{
+  "username": "admin",
+  "password": "admin-secret"
+}
+
+###
+
+### POST /books — as admin -> expect 201
+POST http://localhost:3002/books
+Cookie: connect.sid=PASTE_ADMIN_SESSION_COOKIE_HERE
+Content-Type: application/json
+
+{
+  "title": "Security Engineering",
+  "author": "Ross Anderson",
+  "genre": "security"
+}
+
+###
+
+### Logout -> expect 200, session destroyed
+POST http://localhost:3002/logout
+Cookie: connect.sid=PASTE_SESSION_COOKIE_HERE
+
+###
+
+### GET /books after logout -> expect 401 (session gone)
+GET http://localhost:3002/books
+Cookie: connect.sid=PASTE_SESSION_COOKIE_HERE

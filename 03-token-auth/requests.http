@@ -1,0 +1,82 @@
+# Module 03 — Token-Based Authentication
+# Run the server first: npm run 03:token-auth
+#
+# Key difference from sessions: token is returned in the response body (not a cookie).
+# Client is responsible for storing and sending it.
+# Server still needs to look it up in the store on every request.
+
+### GET /books — no token -> expect 401
+GET http://localhost:3003/books
+
+###
+
+### Login -> expect 200 with { token: "..." } in body
+POST http://localhost:3003/login
+Content-Type: application/json
+
+{
+  "username": "alice",
+  "password": "password123"
+}
+
+###
+
+### GET /books — with token -> expect 200
+# Copy the token from the login response and paste below
+GET http://localhost:3003/books
+Authorization: Bearer PASTE_TOKEN_HERE
+
+###
+
+### GET /me
+GET http://localhost:3003/me
+Authorization: Bearer PASTE_TOKEN_HERE
+
+###
+
+### POST /books — as alice (user) -> expect 403
+POST http://localhost:3003/books
+Authorization: Bearer PASTE_TOKEN_HERE
+Content-Type: application/json
+
+{
+  "title": "Alice's Book",
+  "author": "Alice",
+  "genre": "test"
+}
+
+###
+
+### Login as admin
+POST http://localhost:3003/login
+Content-Type: application/json
+
+{
+  "username": "admin",
+  "password": "admin-secret"
+}
+
+###
+
+### POST /books — as admin -> expect 201
+POST http://localhost:3003/books
+Authorization: Bearer PASTE_ADMIN_TOKEN_HERE
+Content-Type: application/json
+
+{
+  "title": "Security Engineering",
+  "author": "Ross Anderson",
+  "genre": "security"
+}
+
+###
+
+### Logout — invalidates token server-side -> expect 200
+POST http://localhost:3003/logout
+Authorization: Bearer PASTE_TOKEN_HERE
+
+###
+
+### GET /books with invalidated token -> expect 401
+GET http://localhost:3003/books
+Authorization: Bearer PASTE_TOKEN_HERE
