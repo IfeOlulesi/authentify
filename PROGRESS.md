@@ -30,23 +30,22 @@
 ---
 
 ## Module 02 — Session Auth (port 3002)
-- ✅ `middleware/sessionAuth.ts` — scaffolded
-- ✅ `server.ts` — scaffolded (/login, /logout, /me + book routes)
-- ✅ `requests.http` — scaffolded
 
-**To implement:**
-- `requireSession` middleware
-- `requireRole` middleware
-- POST /login — create session, set cookie
-- POST /logout — destroy session
-- Book route handlers
+- ✅ `middleware/sessionAuth.ts` — implemented
+- ✅ `server.ts` — implemented
+- ✅ `requests.http` — ready
+- ✅ `README.md` — written
 
-**Key concepts to understand:**
+**Concepts covered:**
+
 - express-session configuration (secret, resave, saveUninitialized)
 - Cookie flags: HttpOnly, Secure, SameSite, maxAge
 - Server-side session store (MemoryStore vs Redis)
 - Session vs cookie distinction
+- Session fixation — req.session.regenerate() on login
+- Timing-safe login (always run bcrypt even on unknown username)
 - Why logout is now possible (vs Basic Auth)
+- 401 vs 403 distinction
 
 ---
 
