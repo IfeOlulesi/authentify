@@ -50,44 +50,36 @@
 ---
 
 ## Module 03 — Token Auth (port 3003)
-- ✅ `middleware/tokenAuth.ts` — scaffolded
-- ✅ `server.ts` — scaffolded
-- ✅ `requests.http` — scaffolded
+- ✅ `middleware/tokenAuth.ts` — implemented
+- ✅ `server.ts` — implemented
+- ✅ `requests.http` — ready
 
-**To implement:**
-- `tokenAuth` middleware — Bearer token lookup
-- `requireRole`
-- POST /login — generate UUID token, store on user
-- POST /logout — remove token from store
-- Book route handlers
-
-**Key concepts to understand:**
+**Concepts covered:**
 - Bearer token scheme (Authorization: Bearer <token>)
-- Opaque tokens vs self-describing tokens (sets up JWT)
-- Server-side token invalidation
-- Why a DB lookup is still required on every request
+- Opaque tokens: random UUID, no embedded meaning
+- Server-side token store (user.tokens[])
+- Token lookup on every request — O(n) scan / DB index in prod
+- Real logout via token deletion
+- Multiple tokens per user (multi-device)
+- Constant-time login (bcrypt always runs)
 
 ---
 
 ## Module 04 — JWT Auth (port 3004)
-- ✅ `middleware/jwtAuth.ts` — scaffolded
-- ✅ `server.ts` — scaffolded
-- ✅ `requests.http` — scaffolded
+- ✅ `middleware/jwtAuth.ts` — implemented
+- ✅ `server.ts` — implemented
+- ✅ `requests.http` — ready
 
-**To implement:**
-- `generateTokens` — jwt.sign() access + refresh tokens
-- `jwtAuth` middleware — jwt.verify(), no DB lookup
-- `requireRole`
-- POST /login, /refresh, /logout
-- Book route handlers
-
-**Key concepts to understand:**
-- JWT structure: header.payload.signature
-- HS256 vs RS256 signing algorithms
-- Claims: sub, iat, exp, custom claims
-- Access token (short-lived) vs refresh token (long-lived)
-- The token revocation problem — why you can't invalidate an access token
-- Refresh token rotation pattern
+**Concepts covered:**
+- JWT structure: header.payload.signature (base64url, not encrypted)
+- HS256 symmetric signing — same secret signs and verifies
+- Standard claims: sub, iat, exp
+- Custom claims: username, role (embedded at login, verified cryptographically)
+- Access token (15m, stateless) vs refresh token (7d, stored server-side)
+- No DB lookup on every request — purely cryptographic verification
+- The revocation problem: access tokens valid until expiry even after logout
+- Refresh flow: /refresh does one DB lookup to get fresh user claims
+- Algorithm confusion attack — always pin the algorithm in jwt.verify()
 
 ---
 
